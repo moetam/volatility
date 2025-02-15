@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>銘柄ボラティリティ分析</title>
+</head>
+<body>
+    <h1>銘柄ボラティリティ分析ツール</h1>
+
+    <!-- エラーメッセージ表示 -->
+    {% if error_message %}
+        <div style="color: red; font-weight: bold;">
+            {{ error_message }}
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        <label>銘柄コード: <input type="text" name="ticker" value="{{ request.form.get('ticker', '3436.T') }}"></label><br>
+        <label>期間:
+            <select name="period">
+                <option value="1d" {% if request.form.get('period') == '1d' %}selected{% endif %}>1日</option>
+                <option value="5d" {% if request.form.get('period') == '5d' %}selected{% endif %}>5日</option>
+                <option value="1mo" {% if request.form.get('period') == '1mo' %}selected{% endif %}>1ヶ月</option>
+                <option value="3mo" {% if request.form.get('period') == '3mo' %}selected{% endif %}>3ヶ月</option>
+                <option value="6mo" {% if request.form.get('period') == '6mo' %}selected{% endif %}>6ヶ月</option>
+                <option value="1y" {% if request.form.get('period') == '1y' %}selected{% endif %}>1年</option>
+                <option value="2y" {% if request.form.get('period') == '2y' %}selected{% endif %}>2年</option>
+                <option value="5y" {% if request.form.get('period') == '5y' %}selected{% endif %}>5年</option>
+                <option value="10y" {% if request.form.get('period') == '10y' %}selected{% endif %}>10年</option>
+                <option value="ytd" {% if request.form.get('period') == 'ytd' %}selected{% endif %}>年初来</option>
+                <option value="max" {% if request.form.get('period') == 'max' %}selected{% endif %}>最大</option>
+            </select>
+        </label><br>
+
+        <label>時間軸:
+            <select name="interval">
+                <option value="5m" {% if request.form.get('interval') == '5m' %}selected{% endif %}>5分足</option>
+                <option value="10m" {% if request.form.get('interval') == '10m' %}selected{% endif %}>10分足</option>
+                <option value="15m" {% if request.form.get('interval') == '15m' %}selected{% endif %}>15分足</option>
+                <option value="30m" {% if request.form.get('interval') == '30m' %}selected{% endif %}>30分足</option>
+                <option value="60m" {% if request.form.get('interval') == '60m' %}selected{% endif %}>1時間足</option>
+                <option value="1d" {% if request.form.get('interval') == '1d' %}selected{% endif %}>日足</option>
+                <option value="1wk" {% if request.form.get('interval') == '1wk' %}selected{% endif %}>週足</option>
+                <option value="1mo" {% if request.form.get('interval') == '1mo' %}selected{% endif %}>月足</option>
+            </select>
+        </label><br>
+
+        <label>呼値: <input type="number" name="tick_size" step="0.01" value="{{ request.form.get('tick_size', 1) }}"></label><br>
+
+        <button type="submit">分析実行</button>
+    </form>
+
+    {% if volatility_data %}
+        <h2>ボラティリティ結果</h2>
+        <p>陽線 平均値: {{ volatility_data.mean_up }}</p>
+        <p>陽線 中央値: {{ volatility_data.median_up }}</p>
+        <p>陰線 平均値: {{ volatility_data.mean_down }}</p>
+        <p>陰線 中央値: {{ volatility_data.median_down }}</p>
+
+        <h3>ランキング(陽線)</h3>
+        <ul>
+            {% for change, count in volatility_data.top_5_up.items() %}
+                <li>{{ change }}: {{ count }}回</li>
+            {% endfor %}
+        </ul>
+
+        <h3>陽線ボラティリティグラフ</h3>
+        <img src="data:image/png;base64,{{ graph_url_up }}">
+
+        <h3>ランキング(陰線)</h3>
+        <ul>
+            {% for change, count in volatility_data.top_5_down.items() %}
+                <li>{{ change }}: {{ count }}回</li>
+            {% endfor %}
+        </ul>
+
+        <h3>陰線ボラティリティグラフ</h3>
+        <img src="data:image/png;base64,{{ graph_url_down }}">
+    {% endif %}
+
+    <a href= "https://stock-84ax.onrender.com/">反発分析</a>
+    
+</body>
+</html>
