@@ -35,10 +35,15 @@ def volatility():
 
                 # グラフ作成
                 fig, ax = plt.subplots(figsize=(10, 4))
-                ax.hist(df["Volatility"], bins=20, color="blue", alpha=0.7)
-                ax.set_title("Volatility Distribution")
-                ax.set_xlabel("Volatility (Price Range)")
-                ax.set_ylabel("Frequency")
+                ax.bar(df.index, df["Volatility"], color="blue", alpha=0.7)
+                ax.set_title("Volatility Per Day")
+                ax.set_xlabel("Date")
+                ax.set_ylabel("Volatility (Price Range)")
+                ax.tick_params(axis='x', rotation=45)
+
+                # ランキング幅の表示
+                ranking_label = f"ランキング幅: {len(df)}回"
+                plt.figtext(0.5, 0.01, ranking_label, wrap=True, horizontalalignment='center', fontsize=10)
 
                 img = io.BytesIO()
                 plt.tight_layout()
