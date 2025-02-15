@@ -97,8 +97,8 @@ def volatility():
                     plt.close(fig)
                     return graph_url
 
-                graph_url_up = create_graph(up_volatility, "red")
-                graph_url_down = create_graph(down_volatility, "green")
+                graph_url_up = create_graph(up_volatility, "red", tick_size)
+                graph_url_down = create_graph(down_volatility, "green", tick_size)
 
                 # 結果データ
                 volatility_data = {
