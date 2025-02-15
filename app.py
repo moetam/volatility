@@ -12,13 +12,15 @@ app = Flask(__name__)
 def volatility():
     error_message = None
     volatility_data = None
-    graph_url = None
+    graph_url_up = None
+    graph_url_down = None
 
     if request.method == "POST":
         try:
             ticker = request.form["ticker"]
             period = request.form["period"]
             interval = request.form["interval"]
+            tick_size = float(request.form["tick_size"])
 
             stock = yf.Ticker(ticker)
             df = stock.history(period=period, interval=interval, auto_adjust=True)
@@ -28,41 +30,49 @@ def volatility():
             else:
                 # 変動幅の計算
                 df["Volatility"] = df["High"] - df["Low"]
+                df["Up"] = (df["Close"] > df["Open"])
+
+                up_volatility = df[df["Up"]]["Volatility"]
+                down_volatility = df[~df["Up"]]["Volatility"]
 
                 mean_volatility = df["Volatility"].mean()
                 median_volatility = df["Volatility"].median()
-                top_5_volatility = df["Volatility"].nlargest(5).tolist()
+
+                top_5_up = up_volatility.value_counts(bins=np.arange(0, up_volatility.max() + tick_size, tick_size)).nlargest(5).to_dict()
+                top_5_down = down_volatility.value_counts(bins=np.arange(0, down_volatility.max() + tick_size, tick_size)).nlargest(5).to_dict()
 
                 # グラフ作成
-                fig, ax = plt.subplots(figsize=(10, 4))
-                ax.bar(df.index, df["Volatility"], color="blue", alpha=0.7)
-                ax.set_title("Volatility Per Day")
-                ax.set_xlabel("Date")
-                ax.set_ylabel("Volatility (Price Range)")
-                ax.tick_params(axis='x', rotation=45)
+                def create_graph(data, color):
+                    fig, ax = plt.subplots(figsize=(10, 4))
+                    ax.bar(data.index.astype(str), data, color=color, alpha=0.7, width=tick_size)
+                    ax.set_title("Volatility")
+                    ax.set_xlabel("Volatility Range")
+                    ax.set_ylabel("Count")
+                    plt.xticks(rotation=45)
 
-                # ランキング幅の表示
-                ranking_label = f"ランキング幅: {len(df)}回"
-                plt.figtext(0.5, 0.01, ranking_label, wrap=True, horizontalalignment='center', fontsize=10)
+                    img = io.BytesIO()
+                    plt.tight_layout()
+                    plt.savefig(img, format="png")
+                    img.seek(0)
+                    graph_url = base64.b64encode(img.getvalue()).decode()
+                    plt.close(fig)
+                    return graph_url
 
-                img = io.BytesIO()
-                plt.tight_layout()
-                plt.savefig(img, format="png")
-                img.seek(0)
-                graph_url = base64.b64encode(img.getvalue()).decode()
-                plt.close(fig)
+                graph_url_up = create_graph(up_volatility.value_counts(bins=np.arange(0, up_volatility.max() + tick_size, tick_size)), "blue")
+                graph_url_down = create_graph(down_volatility.value_counts(bins=np.arange(0, down_volatility.max() + tick_size, tick_size)), "red")
 
                 # 結果データ
                 volatility_data = {
                     "mean": round(mean_volatility, 2),
                     "median": round(median_volatility, 2),
-                    "top_5": [round(v, 2) for v in top_5_volatility],
+                    "top_5": {**{f"陽線 {k.left:.2f}-{k.right:.2f}": int(v) for k, v in top_5_up.items()},
+                               **{f"陰線 {k.left:.2f}-{k.right:.2f}": int(v) for k, v in top_5_down.items()}}
                 }
 
         except Exception as e:
             error_message = f"エラーが発生しました: {e}"
 
-    return render_template("index.html", error_message=error_message, volatility_data=volatility_data, graph_url=graph_url)
+    return render_template("index.html", error_message=error_message, volatility_data=volatility_data, graph_url_up=graph_url_up, graph_url_down=graph_url_down)
 
 if __name__ == "__main__":
     app.run(debug=True)
