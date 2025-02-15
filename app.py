@@ -53,6 +53,8 @@ def volatility():
                     ax.set_title("Volatility")
                     ax.set_xlabel("Volatility Range")
                     ax.set_ylabel("Count")
+                    ax.set_xticks(np.arange(0, len(bin_edges), step=10))
+                    ax.set_xticklabels([str(int(x)) for x in np.arange(0, len(bin_edges), step=10)])
                     plt.xticks(rotation=45)
 
                     img = io.BytesIO()
