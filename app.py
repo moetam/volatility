@@ -51,18 +51,44 @@ def volatility():
                 top_5_down = down_volatility.value_counts(bins=bin_edges).nlargest(5).to_dict()
 
                 # グラフ描画
-                def create_graph(data, color):
-                    fig, ax = plt.subplots(figsize=(10, 4))
+                def create_graph(data, color, tick_size):
+                    # bin_edgesを作成（0～最大値までtick_size刻み）
+                    data_max = data.max()
+                    if data_max == 0:
+                        # データが0のみの場合などを想定
+                        data_max = tick_size
+                    bin_edges = np.arange(0, data_max + tick_size, tick_size)
+
+                    # 区間ごとにカウント
                     bar_data = data.value_counts(bins=bin_edges).sort_index()
-                    ax.bar(bar_data.index.astype(str), bar_data, color=color, alpha=0.7, width=1)
+                    intervals = bar_data.index  # IntervalIndex
+
+                    # X座標を「区間の中点」として数値で取得
+                    x_vals = [iv.mid for iv in intervals]  # 各Intervalの中心値
+                    y_vals = bar_data.values
+
+                    # グラフ描画
+                    fig, ax = plt.subplots(figsize=(10, 4))
+                    ax.bar(x_vals, y_vals, color=color, alpha=0.7, width=tick_size)
+
                     ax.set_title("Volatility")
                     ax.set_xlabel("Volatility Range")
                     ax.set_ylabel("Count")
-                    # X軸ラベルをbin_edgesから10個刻みで設定
-                    ax.set_xticks(bin_edges[::10])
-                    ax.set_xticklabels([f"{round(x, 2)}" for x in bin_edges[::10]])
+
+                    # X軸の最大値を中点＋呼値で少し余裕を持たせる
+                    x_max = x_vals[-1] + tick_size
+                    ax.set_xlim(0, x_max)
+
+                    # メモリを10刻みにする例（必要に応じて調整）
+                    step = 10
+                    # x_max が小さい場合にステップが大きすぎるとメモリが0だけになるので、最小1とするなど工夫
+                    step = max(1, step)  
+
+                    ax.set_xticks(np.arange(0, x_max + step, step))
+                    ax.set_xticklabels([str(int(v)) for v in np.arange(0, x_max + step, step)])
                     plt.xticks(rotation=45)
 
+                    # 画像をBase64に変換
                     img = io.BytesIO()
                     plt.tight_layout()
                     plt.savefig(img, format="png")
