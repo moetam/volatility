@@ -19,30 +19,30 @@
         <label>銘柄コード: <input type="text" name="ticker" value="{{ request.form.get('ticker', '3436.T') }}"></label><br>
         <label>期間:
             <select name="period">
-                <option value="1d">1日</option>
-                <option value="5d">5日</option>
-                <option value="1mo">1ヶ月</option>
-                <option value="3mo">3ヶ月</option>
-                <option value="6mo">6ヶ月</option>
-                <option value="1y">1年</option>
-                <option value="2y">2年</option>
-                <option value="5y" selected>5年</option>
-                <option value="10y">10年</option>
-                <option value="ytd">年初来</option>
-                <option value="max">最大</option>
+                <option value="1d" {% if request.form.get('period') == '1d' %}selected{% endif %}>1日</option>
+                <option value="5d" {% if request.form.get('period') == '5d' %}selected{% endif %}>5日</option>
+                <option value="1mo" {% if request.form.get('period') == '1mo' %}selected{% endif %}>1ヶ月</option>
+                <option value="3mo" {% if request.form.get('period') == '3mo' %}selected{% endif %}>3ヶ月</option>
+                <option value="6mo" {% if request.form.get('period') == '6mo' %}selected{% endif %}>6ヶ月</option>
+                <option value="1y" {% if request.form.get('period') == '1y' %}selected{% endif %}>1年</option>
+                <option value="2y" {% if request.form.get('period') == '2y' %}selected{% endif %}>2年</option>
+                <option value="5y" {% if request.form.get('period', '5y') == '5y' %}selected{% endif %}>5年</option>
+                <option value="10y" {% if request.form.get('period') == '10y' %}selected{% endif %}>10年</option>
+                <option value="ytd" {% if request.form.get('period') == 'ytd' %}selected{% endif %}>年初来</option>
+                <option value="max" {% if request.form.get('period') == 'max' %}selected{% endif %}>最大</option>
             </select>
         </label><br>
 
         <label>時間軸:
             <select name="interval">
-                <option value="5m">5分足</option>
-                <option value="10m">10分足</option>
-                <option value="15m">15分足</option>
-                <option value="30m">30分足</option>
-                <option value="60m">1時間足</option>
-                <option value="1d">日足</option>
-                <option value="1wk">週足</option>
-                <option value="1mo">月足</option>
+                <option value="5m" {% if request.form.get('interval') == '5m' %}selected{% endif %}>5分足</option>
+                <option value="10m" {% if request.form.get('interval') == '10m' %}selected{% endif %}>10分足</option>
+                <option value="15m" {% if request.form.get('interval') == '15m' %}selected{% endif %}>15分足</option>
+                <option value="30m" {% if request.form.get('interval') == '30m' %}selected{% endif %}>30分足</option>
+                <option value="60m" {% if request.form.get('interval') == '60m' %}selected{% endif %}>1時間足</option>
+                <option value="1d" {% if request.form.get('interval') == '1d' %}selected{% endif %}>日足</option>
+                <option value="1wk" {% if request.form.get('interval') == '1wk' %}selected{% endif %}>週足</option>
+                <option value="1mo" {% if request.form.get('interval') == '1mo' %}selected{% endif %}>月足</option>
             </select>
         </label><br>
 
