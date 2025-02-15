@@ -40,7 +40,6 @@
                 <option value="15m">15分足</option>
                 <option value="30m">30分足</option>
                 <option value="60m">1時間足</option>
-                <option value="240m">4時間足</option>
                 <option value="1d">日足</option>
                 <option value="1wk">週足</option>
                 <option value="1mo">月足</option>
@@ -54,17 +53,27 @@
 
     {% if volatility_data %}
         <h2>ボラティリティ結果</h2>
-        <p>平均値: {{ volatility_data.mean }}</p>
-        <p>中央値: {{ volatility_data.median }}</p>
-        <h3>トップ5変動幅:</h3>
+        <p>陽線 平均値: {{ volatility_data.mean_up }}</p>
+        <p>陽線 中央値: {{ volatility_data.median_up }}</p>
+        <p>陰線 平均値: {{ volatility_data.mean_down }}</p>
+        <p>陰線 中央値: {{ volatility_data.median_down }}</p>
+
+        <h3>ランキング(陽線)</h3>
         <ul>
-            {% for change, count in volatility_data.top_5.items() %}
+            {% for change, count in volatility_data.top_5_up.items() %}
                 <li>{{ change }}: {{ count }}回</li>
             {% endfor %}
         </ul>
 
         <h3>陽線ボラティリティグラフ</h3>
         <img src="data:image/png;base64,{{ graph_url_up }}">
+
+        <h3>ランキング(陰線)</h3>
+        <ul>
+            {% for change, count in volatility_data.top_5_down.items() %}
+                <li>{{ change }}: {{ count }}回</li>
+            {% endfor %}
+        </ul>
 
         <h3>陰線ボラティリティグラフ</h3>
         <img src="data:image/png;base64,{{ graph_url_down }}">
