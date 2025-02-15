@@ -40,17 +40,19 @@ def volatility():
                 mean_down = down_volatility.mean()
                 median_down = down_volatility.median()
 
-                top_5_up = up_volatility.value_counts(bins=np.arange(0, up_volatility.max() + tick_size, tick_size)).nlargest(5).to_dict()
-                top_5_down = down_volatility.value_counts(bins=np.arange(0, down_volatility.max() + tick_size, tick_size)).nlargest(5).to_dict()
+                # 境界値の修正
+                bin_edges = np.arange(0, max(up_volatility.max(), down_volatility.max()) + tick_size, tick_size)
+                top_5_up = up_volatility.value_counts(bins=bin_edges).nlargest(5).to_dict()
+                top_5_down = down_volatility.value_counts(bins=bin_edges).nlargest(5).to_dict()
 
                 # グラフ作成
                 def create_graph(data, color):
                     fig, ax = plt.subplots(figsize=(10, 4))
-                    ax.bar(data.index.astype(str), data, color=color, alpha=0.7, width=tick_size)
+                    bar_data = data.value_counts(bins=bin_edges).sort_index()
+                    ax.bar(bar_data.index.astype(str), bar_data, color=color, alpha=0.7, width=1)
                     ax.set_title("Volatility")
                     ax.set_xlabel("Volatility Range")
                     ax.set_ylabel("Count")
-                    ax.set_xticks(np.arange(0, data.index.right.max() + 10, 10))
                     plt.xticks(rotation=45)
 
                     img = io.BytesIO()
@@ -61,8 +63,8 @@ def volatility():
                     plt.close(fig)
                     return graph_url
 
-                graph_url_up = create_graph(up_volatility.value_counts(bins=np.arange(0, up_volatility.max() + tick_size, tick_size)), "red")
-                graph_url_down = create_graph(down_volatility.value_counts(bins=np.arange(0, down_volatility.max() + tick_size, tick_size)), "green")
+                graph_url_up = create_graph(up_volatility, "red")
+                graph_url_down = create_graph(down_volatility, "green")
 
                 # 結果データ
                 volatility_data = {
