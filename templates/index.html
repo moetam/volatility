@@ -26,7 +26,7 @@
                 <option value="6mo" {% if request.form.get('period') == '6mo' %}selected{% endif %}>6ヶ月</option>
                 <option value="1y" {% if request.form.get('period') == '1y' %}selected{% endif %}>1年</option>
                 <option value="2y" {% if request.form.get('period') == '2y' %}selected{% endif %}>2年</option>
-                <option value="5y" {% if request.form.get('period', '5y') == '5y' %}selected{% endif %}>5年</option>
+                <option value="5y" {% if request.form.get('period') == '5y' %}selected{% endif %}>5年</option>
                 <option value="10y" {% if request.form.get('period') == '10y' %}selected{% endif %}>10年</option>
                 <option value="ytd" {% if request.form.get('period') == 'ytd' %}selected{% endif %}>年初来</option>
                 <option value="max" {% if request.form.get('period') == 'max' %}selected{% endif %}>最大</option>
