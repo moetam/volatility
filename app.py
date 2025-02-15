@@ -26,7 +26,7 @@ def volatility():
             df = stock.history(period=period, interval=interval, auto_adjust=True)
 
             if df.empty:
-                error_message = "無効な銘柄コードが入力されました。正しい銘柄コードを入力してください。"
+                error_message = "読み取り不能な値が入力されているので結果を出せません。"
             else:
                 # 変動幅の計算
                 df["Volatility"] = df["High"] - df["Low"]
@@ -53,8 +53,8 @@ def volatility():
                     ax.set_title("Volatility")
                     ax.set_xlabel("Volatility Range")
                     ax.set_ylabel("Count")
-                    ax.set_xticks(np.arange(0, len(bin_edges), step=10))
-                    ax.set_xticklabels([str(int(x)) for x in np.arange(0, len(bin_edges), step=10)])
+                    ax.set_xticks(bin_edges[::10])
+                    ax.set_xticklabels([f"{round(x, 2)}" for x in bin_edges[::10]])
                     plt.xticks(rotation=45)
 
                     img = io.BytesIO()
