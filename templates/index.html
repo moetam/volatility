@@ -46,7 +46,7 @@
             </select>
         </label><br>
 
-        <label>呼値: <input type="number" name="tick_size" step="0.01" value="{{ request.form.get('tick_size', 1) }}"></label><br>
+        <label>呼値: <input type="number" name="tick_size" step="0.1" value="{{ request.form.get('tick_size', 1) }}"></label><br>
 
         <button type="submit">分析実行</button>
     </form>
@@ -78,8 +78,5 @@
         <h3>陰線ボラティリティグラフ</h3>
         <img src="data:image/png;base64,{{ graph_url_down }}">
     {% endif %}
-
-    <a href= "https://stock-84ax.onrender.com/">反発分析</a>
-    
 </body>
 </html>
