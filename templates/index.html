@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>銘柄ボラティリティ分析</title>
+</head>
+<body>
+    <h1>銘柄ボラティリティ分析ツール</h1>
+
+    <!-- エラーメッセージ表示 -->
+    {% if error_message %}
+        <div style="color: red; font-weight: bold;">
+            {{ error_message }}
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        <label>銘柄コード: <input type="text" name="ticker" value="{{ request.form.get('ticker', '3436.T') }}"></label><br>
+        <label>期間:
+            <select name="period">
+                <option value="1d">1日</option>
+                <option value="5d">5日</option>
+                <option value="1mo">1ヶ月</option>
+                <option value="3mo">3ヶ月</option>
+                <option value="6mo">6ヶ月</option>
+                <option value="1y">1年</option>
+                <option value="2y">2年</option>
+                <option value="5y" selected>5年</option>
+                <option value="10y">10年</option>
+                <option value="ytd">年初来</option>
+                <option value="max">最大</option>
+            </select>
+        </label><br>
+
+        <label>時間軸:
+            <select name="interval">
+                <option value="5m">5分足</option>
+                <option value="10m">10分足</option>
+                <option value="15m">15分足</option>
+                <option value="30m">30分足</option>
+                <option value="60m">1時間足</option>
+                <option value="240m">4時間足</option>
+                <option value="1d">日足</option>
+                <option value="1wk">週足</option>
+                <option value="1mo">月足</option>
+            </select>
+        </label><br>
+
+        <button type="submit">分析実行</button>
+    </form>
+
+    {% if volatility_data %}
+        <h2>ボラティリティ結果</h2>
+        <p>平均値: {{ volatility_data.mean }}</p>
+        <p>中央値: {{ volatility_data.median }}</p>
+        <h3>トップ5変動幅:</h3>
+        <ul>
+            {% for change in volatility_data.top_5 %}
+                <li>{{ change }}</li>
+            {% endfor %}
+        </ul>
+
+        <h3>ボラティリティグラフ</h3>
+        <img src="data:image/png;base64,{{ graph_url }}">
+    {% endif %}
+</body>
+</html>
