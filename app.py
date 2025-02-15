@@ -28,24 +28,29 @@ def volatility():
             if df.empty:
                 error_message = "読み取り不能な値が入力されているので結果を出せません。"
             else:
-                # 変動幅の計算
+                    # 変動幅の計算
                 df["Volatility"] = df["High"] - df["Low"]
-                df["Up"] = (df["Close"] > df["Open"])
+                # 呼値で丸め
+                df["Volatility"] = (df["Volatility"] / tick_size).round() * tick_size
 
+                # 陽線・陰線を分割
+                df["Up"] = df["Close"] > df["Open"]
                 up_volatility = df[df["Up"]]["Volatility"]
                 down_volatility = df[~df["Up"]]["Volatility"]
 
+                # 平均値・中央値
                 mean_up = up_volatility.mean()
                 median_up = up_volatility.median()
                 mean_down = down_volatility.mean()
                 median_down = down_volatility.median()
 
-                # 境界値の修正
+                # ランキング用bin
                 bin_edges = np.arange(0, max(up_volatility.max(), down_volatility.max()) + tick_size, tick_size)
+
                 top_5_up = up_volatility.value_counts(bins=bin_edges).nlargest(5).to_dict()
                 top_5_down = down_volatility.value_counts(bins=bin_edges).nlargest(5).to_dict()
 
-                # グラフ作成
+                # グラフ描画
                 def create_graph(data, color):
                     fig, ax = plt.subplots(figsize=(10, 4))
                     bar_data = data.value_counts(bins=bin_edges).sort_index()
@@ -53,6 +58,7 @@ def volatility():
                     ax.set_title("Volatility")
                     ax.set_xlabel("Volatility Range")
                     ax.set_ylabel("Count")
+                    # X軸ラベルをbin_edgesから10個刻みで設定
                     ax.set_xticks(bin_edges[::10])
                     ax.set_xticklabels([f"{round(x, 2)}" for x in bin_edges[::10]])
                     plt.xticks(rotation=45)
