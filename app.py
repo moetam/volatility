@@ -35,8 +35,10 @@ def volatility():
                 up_volatility = df[df["Up"]]["Volatility"]
                 down_volatility = df[~df["Up"]]["Volatility"]
 
-                mean_volatility = df["Volatility"].mean()
-                median_volatility = df["Volatility"].median()
+                mean_up = up_volatility.mean()
+                median_up = up_volatility.median()
+                mean_down = down_volatility.mean()
+                median_down = down_volatility.median()
 
                 top_5_up = up_volatility.value_counts(bins=np.arange(0, up_volatility.max() + tick_size, tick_size)).nlargest(5).to_dict()
                 top_5_down = down_volatility.value_counts(bins=np.arange(0, down_volatility.max() + tick_size, tick_size)).nlargest(5).to_dict()
@@ -48,6 +50,7 @@ def volatility():
                     ax.set_title("Volatility")
                     ax.set_xlabel("Volatility Range")
                     ax.set_ylabel("Count")
+                    ax.set_xticks(np.arange(0, data.index.right.max() + 10, 10))
                     plt.xticks(rotation=45)
 
                     img = io.BytesIO()
@@ -58,15 +61,17 @@ def volatility():
                     plt.close(fig)
                     return graph_url
 
-                graph_url_up = create_graph(up_volatility.value_counts(bins=np.arange(0, up_volatility.max() + tick_size, tick_size)), "blue")
-                graph_url_down = create_graph(down_volatility.value_counts(bins=np.arange(0, down_volatility.max() + tick_size, tick_size)), "red")
+                graph_url_up = create_graph(up_volatility.value_counts(bins=np.arange(0, up_volatility.max() + tick_size, tick_size)), "red")
+                graph_url_down = create_graph(down_volatility.value_counts(bins=np.arange(0, down_volatility.max() + tick_size, tick_size)), "green")
 
                 # 結果データ
                 volatility_data = {
-                    "mean": round(mean_volatility, 2),
-                    "median": round(median_volatility, 2),
-                    "top_5": {**{f"陽線 {k.left:.2f}-{k.right:.2f}": int(v) for k, v in top_5_up.items()},
-                               **{f"陰線 {k.left:.2f}-{k.right:.2f}": int(v) for k, v in top_5_down.items()}}
+                    "mean_up": round(mean_up, 2),
+                    "median_up": round(median_up, 2),
+                    "mean_down": round(mean_down, 2),
+                    "median_down": round(median_down, 2),
+                    "top_5_up": {f"{k.left:.2f}-{k.right:.2f}": int(v) for k, v in top_5_up.items()},
+                    "top_5_down": {f"{k.left:.2f}-{k.right:.2f}": int(v) for k, v in top_5_down.items()}
                 }
 
         except Exception as e:
