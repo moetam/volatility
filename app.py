@@ -26,7 +26,7 @@ def volatility():
             df = stock.history(period=period, interval=interval, auto_adjust=True)
 
             if df.empty:
-                error_message = "読み取り不能な値が入力されているので結果を出せません。"
+                error_message = "読み取り不能な値が入力されているので結果を出せません。byもえちゃん"
             else:
                     # 変動幅の計算
                 df["Volatility"] = df["High"] - df["Low"]
