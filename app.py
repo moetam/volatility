@@ -18,6 +18,9 @@ def volatility():
     if request.method == "POST":
         try:
             ticker = request.form["ticker"]
+            if "." not in ticker:
+                # 「.」が入っていなければ、.T を自動追加
+                ticker += ".T"
             period = request.form["period"]
             interval = request.form["interval"]
             tick_size = float(request.form["tick_size"])
